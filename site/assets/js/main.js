@@ -268,6 +268,35 @@
     if (!RM) ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'bottom top', onUpdate: (s) => { vel += gsap.utils.clamp(-1.2, 1.2, s.getVelocity() / 2600); } });
   });
 
+  /* ---- 3D India map */
+  $$('[data-imap]').forEach((sec) => {
+    const tabs = $$('.imap__tab', sec);
+    let cur = tabs[0].dataset.city, timer = null, touched = false;
+    const show = (id, user) => {
+      if (user) { touched = true; clearInterval(timer); }
+      cur = id;
+      tabs.forEach((t) => { const on = t.dataset.city === id; t.classList.toggle('is-on', on); t.setAttribute('aria-selected', String(on)); });
+      $$('.imap__panel', sec).forEach((p) => { const on = p.id === `imap-panel-${id}`; if (on && p.hidden && !RM) gsap.fromTo(p.children, { opacity: 0, x: 30 }, { opacity: 1, x: 0, stagger: 0.06, duration: 0.7 }); p.hidden = !on; p.classList.toggle('is-on', on); });
+      $$('.imap__pin', sec).forEach((p) => p.classList.toggle('is-on', p.dataset.pin === id));
+      $$('.imap__ring', sec).forEach((p) => p.classList.toggle('is-on', p.dataset.pulse === id));
+      $$('.imap__arc', sec).forEach((p) => p.classList.toggle('is-on', p.dataset.arc === id));
+    };
+    tabs.forEach((t) => { t.addEventListener('click', () => show(t.dataset.city, true)); t.addEventListener('pointerenter', () => FINE && show(t.dataset.city, true)); });
+    show(cur);
+    const cycle = () => { if (touched || RM) return; clearInterval(timer); timer = setInterval(() => { const i = tabs.findIndex((t) => t.dataset.city === cur); show(tabs[(i + 1) % tabs.length].dataset.city); }, 3200); };
+    new IntersectionObserver(([e]) => { e.isIntersecting ? cycle() : clearInterval(timer); }, { threshold: 0.3 }).observe(sec);
+    if (!RM) {
+      const tl = gsap.timeline({ scrollTrigger: { trigger: $('.imap__stage', sec), start: 'top 78%', once: true } });
+      tl.from($('.imap__tilt', sec), { rotateX: 0, rotateZ: 0, scale: 0.8, opacity: 0, duration: 2, ease: 'expo.out' }, 0)
+        .fromTo($('.imap__edge', sec), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut' }, 0.1)
+        .from($('.imap__land', sec), { opacity: 0, duration: 1.4 }, 0.9)
+        .from($$('.imap__beam', sec), { height: 0, opacity: 0, duration: 1.1, stagger: 0.14, clearProps: 'height,opacity' }, 1.2)
+        .from($$('.imap__label', sec), { opacity: 0, duration: 0.6, stagger: 0.14, clearProps: 'opacity' }, 1.6)
+        .from($$('.imap__arc', sec), { opacity: 0, duration: 0.8, stagger: 0.1, clearProps: 'opacity' }, 1.6);
+      gsap.to($('.imap__stage', sec), { yPercent: -6, ease: 'none', scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: true } });
+    }
+  });
+
   /* ---- work filter */
   const chips = $$('.chip');
   chips.forEach((chip) => chip.addEventListener('click', () => {

@@ -2,6 +2,8 @@
 import { writeFileSync, readFileSync } from 'node:fs';
 import { site, verticals, projects, capabilities, process as steps } from './src/data.mjs';
 
+import { india, cityXY } from './src/india.mjs';
+
 const dims = JSON.parse(readFileSync('./site/assets/img/dims.json', 'utf8'));
 const V = verticals;
 const vlist = Object.values(V);
@@ -135,6 +137,46 @@ const logoWall = () => {
   return `<div class="lwall" data-lwall><div class="lwall__plane">${row(site.logos.slice(0, 6), '')}${row(site.logos.slice(6), 'lrow--rev')}${row(site.logos.slice(3, 9), 'lrow--slow')}</div></div>`;
 };
 
+const mapSection = () => {
+  const cities = Object.keys(cityXY).map((name) => {
+    const list = projects.filter((p) => p.place === name);
+    const [x, y] = cityXY[name];
+    return { name, id: name.toLowerCase().replace(/\s+/g, '-'), list, x, y, studio: name === 'Mumbai', accent: name === 'Mumbai' ? '' : list[0].v };
+  });
+  const hub = cities.find((c) => c.studio);
+  const arc = (c) => { const mx = (hub.x + c.x) / 2, my = (hub.y + c.y) / 2, dx = c.x - hub.x, dy = c.y - hub.y; return `M${hub.x},${hub.y} Q${(mx - dy * 0.28).toFixed(1)},${(my + dx * 0.28).toFixed(1)} ${c.x},${c.y}`; };
+  return `
+<section class="imap" data-imap>
+  <div class="sec-head sec-head--split">
+    <div><p class="eyebrow" data-reveal>Cue 06 — On the map</p><h2 class="h-xl" data-split>One studio.<br><em>Stages across India.</em></h2></div>
+    <p class="sec-head__side" data-reveal>Built in Mumbai, loaded onto trucks, and raised wherever the night is happening.</p>
+  </div>
+  <div class="imap__grid">
+    <div class="imap__stage" aria-hidden="true">
+      <div class="imap__tilt">
+        <svg viewBox="0 0 ${india.w} ${india.h}" class="imap__svg">
+          <defs><pattern id="imap-dots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.25" fill="currentColor"/></pattern></defs>
+          <path class="imap__land" d="${india.path}" fill="url(#imap-dots)"/>
+          <path class="imap__edge" d="${india.path}" pathLength="1"/>
+          ${cities.filter((c) => !c.studio).map((c) => `<path class="imap__arc" data-arc="${c.id}" d="${arc(c)}" pathLength="1"/>`).join('')}
+          ${cities.map((c) => `<circle class="imap__ring" data-pulse="${c.id}" cx="${c.x}" cy="${c.y}" r="10"/>`).join('')}
+        </svg>
+        ${cities.map((c) => `<div class="imap__pin" data-pin="${c.id}"${c.accent ? ` data-accent="${c.accent}"` : ''} style="left:${((c.x / india.w) * 100).toFixed(2)}%;top:${((c.y / india.h) * 100).toFixed(2)}%;--h:${{ mumbai: 70, hyderabad: 120, udaipur: 150, 'greater-noida': 100 }[c.id] || 100}px"><i class="imap__beam"></i><span class="imap__label">${c.name}${c.studio ? '<small>Studio</small>' : ''}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="imap__side">
+      <div class="imap__tabs" role="tablist" aria-label="Cities">
+        ${cities.map((c, i) => `<button class="imap__tab${i === 0 ? ' is-on' : ''}" role="tab" id="imap-tab-${c.id}" aria-controls="imap-panel-${c.id}" aria-selected="${i === 0}" data-city="${c.id}"${c.accent ? ` data-accent="${c.accent}"` : ''}><span>${c.name}</span><small>${c.studio ? 'Studio · ' : ''}${c.list.length} production${c.list.length === 1 ? '' : 's'}</small></button>`).join('')}
+      </div>
+      ${cities.map((c, i) => `<div class="imap__panel${i === 0 ? ' is-on' : ''}" role="tabpanel" id="imap-panel-${c.id}" aria-labelledby="imap-tab-${c.id}"${i === 0 ? '' : ' hidden'}>
+        ${c.list.map((p) => `<a href="${href(p)}" class="imap__item" data-accent="${p.v}">${img(cover(p), '', { sizes: '120px' })}<span><small>${V[p.v].name} · ${p.type}</small>${p.title}</span>${arrow}</a>`).join('')}
+      </div>`).join('')}
+      <a href="work.html" class="link"><span>All productions</span>${arrow}</a>
+    </div>
+  </div>
+</section>`;
+};
+
 const statsBlock = () => `
 <section class="stats">
   ${site.stats.map((s) => `<div class="stat" data-reveal><div class="stat__n"><span data-count="${s.n}">0</span>${s.suffix}</div><p>${s.label}</p></div>`).join('')}
@@ -240,6 +282,8 @@ page({
 </section>
 
 ${statsBlock()}
+
+${mapSection()}
 
 <section class="assoc">
   <p class="eyebrow" data-reveal>In good company</p>
