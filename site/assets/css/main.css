@@ -413,13 +413,6 @@ html.js .vhero__media img { transform: scale(1.25); }
 .ltile:hover { transform: translateZ(70px) scale(1.06); box-shadow: 0 50px 80px -30px rgba(0, 0, 0, 1), 0 0 60px -10px var(--accent); }
 .ltile:hover img { filter: none; opacity: 1; transform: scale(1.06); }
 
-/* ---------- video text band */
-.vband { position: relative; height: min(92vh, 900px); overflow: hidden; isolation: isolate; background: linear-gradient(100deg, #22c3c4, #3d7dff 50%, #ff4f8b); margin-bottom: var(--sec); }
-.vband video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(1.7) saturate(1.5) contrast(1.05); }
-.vband__mask { position: absolute; inset: -2px; background: #050608; color: #fff; mix-blend-mode: multiply; display: grid; align-items: center; }
-.vband__line { font-family: var(--f-display); font-weight: 500; font-size: clamp(7rem, 27vw, 30rem); line-height: .9; letter-spacing: -.05em; white-space: nowrap; will-change: transform; padding-left: 4vw; }
-.vband__line i { font-style: normal; font-size: .3em; vertical-align: middle; margin: 0 .2em; }
-
 /* ---------- expanding 3D video */
 .vexp { position: relative; background: #050608; }
 .vexp__pin { position: relative; height: 100vh; height: 100svh; overflow: hidden; perspective: 1500px; display: grid; place-items: center; }
@@ -484,7 +477,6 @@ html.js [data-img-reveal] img { transform: scale(1.3); }
   .strip { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .strip__track { height: 52vh; }
   .fly { height: 480vh; }
-  .vband { height: 56vh; }
   .lwall__plane { transform: rotateX(20deg) rotateY(-10deg) rotateZ(3deg) scale(1.15); }
   .fly__hint { display: none; }
   .reel__frame { aspect-ratio: 4 / 3.4; }

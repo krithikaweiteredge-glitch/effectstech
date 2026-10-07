@@ -149,9 +149,6 @@
     $$('.shot').forEach((el) => {
       gsap.fromTo(el, { rotateX: 16, scale: 0.9, transformPerspective: 1300, transformOrigin: '50% 100%' }, { rotateX: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 50%', scrub: 0.6 } });
     });
-    $$('[data-vband]').forEach((el) => {
-      gsap.fromTo($('.vband__line', el), { xPercent: 4 }, { xPercent: -62, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.5 } });
-    });
     $$('[data-vexp]').forEach((el) => {
       const words = $$('.vexp__txt > *', el);
       gsap.timeline({ scrollTrigger: { trigger: el, start: 'top top', end: '+=160%', pin: $('.vexp__pin', el), scrub: 0.7, anticipatePin: 1 } })
